@@ -47,6 +47,8 @@ find_package(tf2_ros REQUIRED)
 find_package(tf2_eigen REQUIRED)
 find_package(tf2_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
+find_package(rosbag2_cpp)
+find_package(urdf)
 
 find_package(LuaGoogle REQUIRED)
 find_package(PCL REQUIRED COMPONENTS common)
@@ -88,6 +90,10 @@ set(ALL_SRCS
   "cartographer_ros/trajectory_options.cc"
   "cartographer_ros/submap.cc"
   "cartographer_ros/ros_map.cc"
+  "cartographer_ros/assets_writer.cc"
+  "cartographer_ros/split_string.cc"
+  "cartographer_ros/ros_map_writing_points_processor.cc"
+  "cartographer_ros/urdf_reader.cc"
 )
 add_library(${PROJECT_NAME} ${ALL_SRCS})
 ament_target_dependencies(${PROJECT_NAME} PUBLIC
@@ -103,6 +109,8 @@ ament_target_dependencies(${PROJECT_NAME} PUBLIC
   tf2_msgs
   tf2_ros
   visualization_msgs
+  rosbag2_cpp
+  urdf
 )
 add_subdirectory("cartographer_ros")
 

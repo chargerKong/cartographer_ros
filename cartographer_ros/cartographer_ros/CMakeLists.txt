@@ -35,10 +35,16 @@ add_executable(pbstream_to_ros_map_node
 target_include_directories(pbstream_to_ros_map_node SYSTEM PUBLIC ${LUA_INCLUDE_DIR})
 target_link_libraries(pbstream_to_ros_map_node ${PROJECT_NAME})
 
+add_executable(assets_writer_node
+  assets_writer_main.cc)
+target_include_directories(assets_writer_node SYSTEM PUBLIC ${LUA_INCLUDE_DIR})
+target_link_libraries(assets_writer_node ${PROJECT_NAME})
+
 install(TARGETS
   cartographer_node
   occupancy_grid_node
   pbstream_to_ros_map_node
+  assets_writer_node
   DESTINATION lib/${PROJECT_NAME})
 
 # google_binary(cartographer_assets_writer
