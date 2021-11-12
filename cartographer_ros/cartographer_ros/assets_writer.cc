@@ -45,8 +45,8 @@
 #include "rosbag2_cpp/reader.hpp"
 #include "rosbag2_cpp/readers/sequential_reader.hpp"
 #include "rosbag2_cpp/serialization_format_converter_factory.hpp"
-#include <rclcpp/serialization.hpp>
-#include "tf2_eigen/tf2_eigen.h"
+#include "rclcpp/serialization.hpp"
+#include "tf2_eigen/tf2_eigen.hpp"
 #include "tf2_msgs/msg/tf_message.hpp"
 #include "tf2_ros/buffer.h"
 #include "urdf/model.h"
@@ -196,13 +196,12 @@ void AssetsWriter::Run(const std::string& configuration_directory,
       if (!urdf_filename.empty()) {
         ReadStaticTransformsFromUrdf(urdf_filename, tf_buffer);
       }
-
       const carto::transform::TransformInterpolationBuffer
           transform_interpolation_buffer(trajectory_proto);
       rosbag2_cpp::Reader bag_reader(
         std::make_unique<rosbag2_cpp::readers::SequentialReader>()
       );
-      rosbag2_cpp::StorageOptions storage_options {
+      rosbag2_storage::StorageOptions storage_options {
           bag_filename,
           "sqlite3",
       };
