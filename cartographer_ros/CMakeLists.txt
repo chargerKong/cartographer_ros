@@ -40,15 +40,15 @@ find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(pcl_conversions REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rosbag2_cpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_eigen REQUIRED)
 find_package(tf2_msgs REQUIRED)
+find_package(urdf REQUIRED)
 find_package(visualization_msgs REQUIRED)
-find_package(rosbag2_cpp)
-find_package(urdf)
 
 find_package(LuaGoogle REQUIRED)
 find_package(PCL REQUIRED COMPONENTS common)
@@ -78,21 +78,21 @@ include_directories(
 # list(REMOVE_ITEM ALL_SRCS ${ALL_EXECUTABLES})
 
 set(ALL_SRCS
+  "cartographer_ros/assets_writer.cc"
   "cartographer_ros/map_builder_bridge.cc"
   "cartographer_ros/msg_conversion.cc"
   "cartographer_ros/node.cc"
   "cartographer_ros/node_constants.cc"
   "cartographer_ros/node_options.cc"
   "cartographer_ros/ros_log_sink.cc"
+  "cartographer_ros/ros_map.cc"
+  "cartographer_ros/ros_map_writing_points_processor.cc"
   "cartographer_ros/sensor_bridge.cc"
+  "cartographer_ros/split_string.cc"
+  "cartographer_ros/submap.cc"
   "cartographer_ros/tf_bridge.cc"
   "cartographer_ros/time_conversion.cc"
   "cartographer_ros/trajectory_options.cc"
-  "cartographer_ros/submap.cc"
-  "cartographer_ros/ros_map.cc"
-  "cartographer_ros/assets_writer.cc"
-  "cartographer_ros/split_string.cc"
-  "cartographer_ros/ros_map_writing_points_processor.cc"
   "cartographer_ros/urdf_reader.cc"
 )
 add_library(${PROJECT_NAME} ${ALL_SRCS})
@@ -102,15 +102,15 @@ ament_target_dependencies(${PROJECT_NAME} PUBLIC
   nav_msgs
   pcl_conversions
   rclcpp
+  rosbag2_cpp
   sensor_msgs
   std_msgs
   tf2
   tf2_eigen
   tf2_msgs
   tf2_ros
-  visualization_msgs
-  rosbag2_cpp
   urdf
+  visualization_msgs
 )
 add_subdirectory("cartographer_ros")
 
