@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <unordered_map>
 
 #include "cartographer/common/configuration_file_resolver.h"
 #include "cartographer/common/make_unique.h"
@@ -180,7 +181,7 @@ void AssetsWriter::Run(const std::string& configuration_directory,
           lua_parameter_dictionary->GetDictionary("pipeline").get());
   const std::string tracking_frame =
       lua_parameter_dictionary->GetString("tracking_frame");
-  rclcpp::Clock::SharedPtr clock = std::make_shared<rclcpp::Clock>(RCL_SYSTEM_TIME);
+  rclcpp::Clock::SharedPtr clock = std::make_shared<rclcpp::Clock>(RCL_ROS_TIME);
   do {
     for (size_t trajectory_id = 0; trajectory_id < bag_filenames_.size();
          ++trajectory_id) {
@@ -191,10 +192,10 @@ void AssetsWriter::Run(const std::string& configuration_directory,
       if (trajectory_proto.node_size() == 0) {
         continue;
       }
-      std::shared_ptr<tf2_ros::Buffer> tf_buffer = std::make_shared<tf2_ros::Buffer>(clock);
-      tf_buffer->setUsingDedicatedThread(true);
+      tf2_ros::Buffer tf_buffer(clock);
+      tf_buffer.setUsingDedicatedThread(true);
       if (!urdf_filename.empty()) {
-        ReadStaticTransformsFromUrdf(urdf_filename, tf_buffer);
+        ReadStaticTransformsFromUrdf(urdf_filename, &tf_buffer);
       }
       const carto::transform::TransformInterpolationBuffer
           transform_interpolation_buffer(trajectory_proto);
@@ -236,7 +237,7 @@ void AssetsWriter::Run(const std::string& configuration_directory,
           serializer.deserialize_message(&serialized_msg, &tf_message);
           for (const auto& transform : tf_message.transforms) {
             try {
-              tf_buffer->setTransform(transform, "unused_authority",
+              tf_buffer.setTransform(transform, "unused_authority",
                                      message->topic_name == kTfStaticTopic);
             } catch (const tf2::TransformException& ex) {
               LOG(WARNING) << ex.what();
@@ -260,19 +261,19 @@ void AssetsWriter::Run(const std::string& configuration_directory,
             point_cloud2_serializer.deserialize_message(&serialized_msg, &point_cloud2_msg);
             points_batch = HandleMessage(
                 point_cloud2_msg,
-                tracking_frame, *tf_buffer, transform_interpolation_buffer);
+                tracking_frame, tf_buffer, transform_interpolation_buffer);
           } else if (topic_name_to_type[delayed_message.topic_name] == "sensor_msgs/msg/MultiEchoLaserScan") {
             sensor_msgs::msg::MultiEchoLaserScan multi_echo_laser_scan_msg;
             multi_echo_laser_scan_serializer.deserialize_message(&serialized_msg, &multi_echo_laser_scan_msg);
             points_batch = HandleMessage(
                 multi_echo_laser_scan_msg,
-                tracking_frame, *tf_buffer, transform_interpolation_buffer);
+                tracking_frame, tf_buffer, transform_interpolation_buffer);
           } else if (topic_name_to_type[delayed_message.topic_name] == "sensor_msgs/msg/LaserScan") {
             sensor_msgs::msg::LaserScan laser_scan_msg;
             laser_scan_serializer.deserialize_message(&serialized_msg, &laser_scan_msg);
             points_batch = HandleMessage(
                 laser_scan_msg,
-                tracking_frame, *tf_buffer, transform_interpolation_buffer);
+                tracking_frame, tf_buffer, transform_interpolation_buffer);
           }
           if (points_batch != nullptr) {
             points_batch->trajectory_id = trajectory_id;
